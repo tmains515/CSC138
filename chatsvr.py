@@ -99,8 +99,9 @@ def handleClient(client_address, client_socket):
                     break
 
                 case "LOG":
-                    client_socket.send("ERROR: Unknown command".encode())
-
+                    log = ""
+                    with open(f"{client_address[0]}.txt", "r") as file:
+                        client_socket.send(file.read().encode())
     except Exception as e:
         print(f"Client error: {e}")
     finally:
