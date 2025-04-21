@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 from socket import *
@@ -21,42 +22,36 @@ def client(server_name, server_port):
                 if not msg:
                     print("\nServer disconnected")
                     break
-                print("\n" + msg)  # Print server responses on new line
+                print("\n" + msg)
             except:
                 print("\nConnection error")
                 break
 
+    # Start individual thread
     threading.Thread(target=receive_messages, daemon=True).start()
+    print(f"Enter JOIN followed by your username: ")
 
-
+    # Loop waiting for message
     while True:
         message = input()
+        message = message
         if not message:
             continue
 
         clientSocket.send(message.encode())
 
-        if message == "QUIT":
-            break
+        if message.upper().startswith("QUIT"):
+            clientSocket.close()
+            sys.exit(0)
 
-        if message == "JOIN":
-            # After JOIN, wait for acknowledgement
+
+        if message.upper().startswith("JOIN"):
             response = clientSocket.recv(2048).decode()
             print(response)
             if "ERROR" in response:
                 clientSocket.close()
-                return
-
-#Leave open channel to receive messages
-def receive_messages(clientSocket):
-    while True:
-        try:
-            message = clientSocket.recv(2048)
-            if not message:
                 break
-            print(message.decode())
-        except:
-            break
+
 
 def main():
     if len(sys.argv) != 3:
